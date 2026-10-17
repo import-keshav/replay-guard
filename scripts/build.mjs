@@ -15,4 +15,6 @@ await build({
 });
 await copyFile('src/content.css', 'dist/content.css');
 await copyFile('manifest.json', 'dist/manifest.json');
+await mkdir('dist/icons');
+for (const s of [16, 32, 48, 128]) await copyFile(`icons/icon-${s}.png`, `dist/icons/icon-${s}.png`);
 console.log('Built extension in dist/');

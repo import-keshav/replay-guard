@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- Source of screenshot-1280x800.png: the two real screenshots are 1024 px wide and 444 + 356 = 800 px tall, so they stack unscaled. -->
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #111827; font: 700 20px/1 system-ui, sans-serif; }
+  img { position: absolute; left: 128px; display: block; }
+  .label { position: absolute; left: 0; width: 128px; display: flex; align-items: center; justify-content: center; }
+  .label span { padding: 8px 12px; border-radius: 6px; color: #fff; letter-spacing: 0.06em; }
+  .divider { position: absolute; left: 0; top: 442px; width: 1280px; height: 4px; background: #4f46e5; }
+  .icon { left: auto; right: 16px; bottom: 16px; width: 96px; height: 96px; }
+</style>
+<img src="../docs/before.jpg" style="top: 0" alt="">
+<img src="../docs/after.png" style="top: 444px" alt="">
+<div class="label" style="top: 0; height: 444px"><span style="background: #6b7280">BEFORE</span></div>
+<div class="label" style="top: 444px; height: 356px"><span style="background: #4f46e5">AFTER</span></div>
+<div class="divider"></div>
+<img class="icon" src="../icons/icon.svg" alt="">

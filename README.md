@@ -112,6 +112,8 @@ This happens only once per video. After that, seeking, pausing and skipping are 
 - **One network request per day**, to `api.jolpi.ca`, to download the public driver list. It sends nothing about you or what you watch. No analytics, no tracking.
 - **The only thing it changes** on the page is CSS visibility and the video's playback position.
 
+Full details: [privacy policy](PRIVACY.md).
+
 ## Known limitations
 
 - **Keyword-based spoiler detection.** A spoiler phrased without any of the listed words (for example "What a day for the Silver Arrows!") is not caught.
@@ -139,6 +141,7 @@ npm test           # unit tests (Node's built-in test runner, runs the TypeScrip
 npm run typecheck  # tsc --noEmit
 npm run build      # bundles src/ into dist/ with esbuild
 npm run package    # build + zip dist/ into replay-guard.zip
+npm run assets     # re-render icons/*.png and the store images (macOS: sips + Chrome; set CHROME to another binary if needed)
 ```
 
 ```text
@@ -148,6 +151,10 @@ src/content.ts       applies the rules to the page (text scanning, driver list f
 src/content.css      hides thumbnails and draws grey bars over spoiler text
 test/rules.test.mjs  tests built from real FanCode titles
 scripts/build.mjs    esbuild bundle into dist/
+scripts/assets.sh    renders the PNGs below from their SVG/HTML sources
+icons/               icon.svg (source) and the 16/32/48/128 px PNGs shipped in the package
+store/               Chrome Web Store listing text (listing.md), screenshot and promo tile with their HTML sources
+PRIVACY.md           privacy policy linked from the store listing
 ```
 
 ## Disclaimer

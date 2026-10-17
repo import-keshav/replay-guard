@@ -30,7 +30,8 @@ async function loadDrivers(): Promise<void> {
   const { drivers } = (await chrome.storage.local.get('drivers')) as { drivers?: { names: string[]; at: number } };
   if (drivers?.names.length) applyDrivers(drivers.names);
   if (drivers && Date.now() - drivers.at < DAY_MS) return;
-  const res = await fetch(DRIVERS_URL, { signal: AbortSignal.timeout(60_000) });
+  // no-referrer: otherwise FanCode's referrer policy decides whether the page URL reaches the API.
+  const res = await fetch(DRIVERS_URL, { referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(60_000) });
   const names = parseDrivers(await res.json());
   if (!names.length) return;
   await chrome.storage.local.set({ drivers: { names, at: Date.now() } });
