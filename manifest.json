@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Replay Guard",
+  "version": "0.3.0",
+  "description": "FanCode F1: hides thumbnails and spoiler titles, and starts every video from the beginning.",
+  "minimum_chrome_version": "120",
+  "content_scripts": [
+    {
+      "matches": ["https://fancode.com/*", "https://www.fancode.com/*"],
+      "css": ["content.css"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+/* ponytail: thumbnails painted via class-based background-image are not caught. */
+html[data-rg-f1] img,
+html[data-rg-f1] picture,
+html[data-rg-f1] [style*="background-image"] { visibility: hidden !important; }
+html[data-rg-f1] [data-rg-spoiler],
+html[data-rg-f1] [data-rg-spoiler] * {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+}
+html[data-rg-f1] [data-rg-spoiler] { background: rgba(128, 128, 128, 0.35) !important; border-radius: 4px; }
