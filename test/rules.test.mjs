@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { isF1Page, isSpoiler, startTarget } from '../src/rules.ts';
+import { isF1Page, isSpoiler, parseDrivers, setDrivers, startTarget } from '../src/rules.ts';
 
 test('only FanCode F1 pages are handled', () => {
   for (const u of [
@@ -41,6 +41,31 @@ test('session replay titles and navigation stay visible', () => {
     'The Sting Within Me ft. Alan Walker', 'Home', 'Live Now', 'Schedule', 'Formula 1',
     'REPLAY', '2:15:00', 'Practice 2', 'Maximum', 'Passport', 'Leadership',
   ]) assert.equal(isSpoiler(t), false, t);
+});
+
+test('first names, nicknames and unaccented spellings are caught for every driver', () => {
+  for (const t of [
+    'Max takes it', 'George on top in Austin', 'Alex delivers for Williams', 'Ollie scores again',
+    'Checo is back', 'Kimi magic', 'Hulkenberg finally', 'Perez on the podium', 'Lance and Fernando',
+  ]) assert.equal(isSpoiler(t), true, t);
+});
+
+test('drivers from the API extend the list', () => {
+  assert.equal(isSpoiler('Herta impresses in FP1'), false);
+  setDrivers(parseDrivers({ MRData: { DriverTable: { Drivers: [{ givenName: 'Colton', familyName: 'Herta' }] } } }));
+  assert.equal(isSpoiler('Herta impresses in FP1'), true);
+  assert.equal(isSpoiler('Colton impresses in FP1'), true);
+  setDrivers([]);
+});
+
+test('malformed API responses are dropped', () => {
+  assert.deepEqual(parseDrivers(null), []);
+  assert.deepEqual(parseDrivers({ MRData: { DriverTable: { Drivers: 'x' } } }), []);
+  assert.deepEqual(parseDrivers({ MRData: { DriverTable: { Drivers: [
+    { givenName: 'Nico', familyName: 'Hülkenberg' },
+    { givenName: '(.*)', familyName: 'Evil' },
+    { givenName: 'A', familyName: 7 },
+  ] } } }), ['Nico Hülkenberg']);
 });
 
 test('videos start from the beginning; live only when a DVR window exists', () => {

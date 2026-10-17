@@ -1,6 +1,6 @@
 {
   "name": "replay-guard",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "FanCode F1: hides thumbnails and spoiler titles, and starts every video from the beginning.",
   "type": "module",
@@ -11,6 +11,7 @@
     "package": "node scripts/build.mjs && rm -f replay-guard.zip && cd dist && zip -qr ../replay-guard.zip ."
   },
   "devDependencies": {
+    "@types/chrome": "^0.3.5",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2"
   }

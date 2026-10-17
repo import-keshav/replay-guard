@@ -68,13 +68,23 @@ While you are on an F1 page, every `<img>`, `<picture>` and element with an inli
 
 Every piece of text that appears on the page (including content loaded later as you scroll) is checked against three word lists:
 
-| List | Examples |
+| List | What's in it |
 | --- | --- |
-| Drivers (surnames and distinctive first names) | Verstappen, Hamilton, Norris, Piastri, Antonelli, Max, Lando, Kimi |
-| Teams | Red Bull, Ferrari, Mercedes, McLaren, Audi, Cadillac |
-| Result words | win, won, podium, pole, P1–P20, overtake, passes, crash, DNF, penalty, champion, dominant, post-race, press conference, hails, admits |
+| Drivers | First name **and** surname of every driver this season, plus common short forms (Alex, Ollie, Checo, Nico, Kimi, Yuki). "Max wins" is caught just like "Verstappen wins". |
+| Teams | Red Bull, Racing Bulls, Ferrari, Mercedes, McLaren, Aston Martin, Alpine, Haas, Williams, Audi, Sauber, Cadillac |
+| Result words | win, won, podium, pole, P1–P20, overtake, passes, crash, DNF, penalty, champion, dominant, post-race, press conference, hails, admits, … |
 
-If a text matches, its element gets a grey bar instead of readable text. Matching is case-insensitive and whole-word only, so "Maximum", "Passport" or "Leadership" are not caught. A spoiler in the browser tab title is replaced with "FanCode".
+If a text matches, its element gets a grey bar instead of readable text. Matching is case-insensitive, accent-insensitive ("Hulkenberg" = "Hülkenberg", "Perez" = "Pérez") and whole-word only, so "Maximum", "Passport" or "Leadership" are not caught. A spoiler in the browser tab title is replaced with "FanCode".
+
+#### The driver list updates itself
+
+The driver list is not hard-coded to one season. The first time you open a FanCode F1 page each day, Replay Guard fetches the current season's drivers from the free [Jolpica F1 API](https://github.com/jolpica/jolpica-f1) (the successor of the Ergast API):
+
+```text
+https://api.jolpi.ca/ergast/f1/current/drivers.json
+```
+
+The response covers everyone who has driven in a session this season, not only the race grid: mid-season replacements and FP1 rookies are included too. The names are cached for 24 hours in the extension's local storage. The API can take a while to answer, so a built-in list of the 2026 grid is always active as well. You are protected from the first page load, even when you're offline or the API is down.
 
 Session replay titles never contain these words, so they stay readable:
 
@@ -97,13 +107,15 @@ This happens only once per video. After that, seeking, pausing and skipping are 
 
 ## Privacy
 
-- **No permissions.** The extension only declares a content script for `fancode.com`. It cannot read other sites, your tabs or your history.
-- **No network requests, no analytics, no storage.** Nothing leaves your browser.
+- **Runs only on `fancode.com`.** The extension cannot read other sites, your tabs or your history.
+- **One permission: `storage`**, used only to cache the driver list for a day. Chrome shows no install warning for it.
+- **One network request per day**, to `api.jolpi.ca`, to download the public driver list. It sends nothing about you or what you watch. No analytics, no tracking.
 - **The only thing it changes** on the page is CSS visibility and the video's playback position.
 
 ## Known limitations
 
-- **Keyword-based spoiler detection.** A spoiler phrased without any of the listed words (for example "What a day for the Silver Arrows!") is not caught. The driver list also has to be updated when the grid changes.
+- **Keyword-based spoiler detection.** A spoiler phrased without any of the listed words (for example "What a day for the Silver Arrows!") is not caught.
+- **Common first names can over-hide.** Because every driver's first name counts, an unrelated "George" or "Oliver" on an F1 page is hidden too. On a spoiler blocker, hiding too much is the safer mistake.
 - **Some thumbnails can slip through.** Images that the site paints through CSS classes (rather than `<img>` or an inline style) are not hidden.
 - **Late resume.** If FanCode restores a saved position *after* the video has already started playing, that position wins.
 - **Live streams can only rewind as far as FanCode allows.** If the rewind window is shorter than the time since the session started, you land at the oldest available point, not lights out.
@@ -113,7 +125,11 @@ If you hit a spoiler that got through, please [open an issue](https://github.com
 
 ## Customising
 
-To add or remove words, edit the `DRIVERS`, `TEAMS` or `RESULTS` arrays in [`src/rules.ts`](src/rules.ts), then run `npm run build` and reload the extension. Each entry is a regular expression fragment, e.g. `'h[uü]lkenberg'` or `'p\\d{1,2}'`.
+Drivers update automatically. To change anything else, edit [`src/rules.ts`](src/rules.ts), then run `npm run build` and reload the extension:
+
+- `NICKNAMES`: short forms that titles use instead of the official first name.
+- `TEAMS` and `RESULTS`: regular expression fragments, e.g. `'red bull'` or `'p\\d{1,2}'`.
+- `SEED_DRIVERS`: the built-in fallback grid.
 
 ## Development
 
@@ -126,9 +142,9 @@ npm run package    # build + zip dist/ into replay-guard.zip
 ```
 
 ```text
-manifest.json        Chrome MV3 manifest: one content script on fancode.com, no permissions
-src/rules.ts         pure logic: which pages, which titles are spoilers, where a video should start
-src/content.ts       applies the rules to the page (text scanning, SPA route changes, video start)
+manifest.json        Chrome MV3 manifest: one content script on fancode.com, `storage` permission
+src/rules.ts         pure logic: which pages, which titles are spoilers, driver API parsing, where a video should start
+src/content.ts       applies the rules to the page (text scanning, driver list fetch + cache, SPA route changes, video start)
 src/content.css      hides thumbnails and draws grey bars over spoiler text
 test/rules.test.mjs  tests built from real FanCode titles
 scripts/build.mjs    esbuild bundle into dist/

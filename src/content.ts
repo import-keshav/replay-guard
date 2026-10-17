@@ -1,4 +1,4 @@
-import { isF1Page, isSpoiler, startTarget } from './rules.ts';
+import { DRIVERS_URL, isF1Page, isSpoiler, parseDrivers, setDrivers, startTarget } from './rules.ts';
 
 const ATTR = 'data-rg-f1';
 const MARK = 'data-rg-spoiler';
@@ -16,11 +16,33 @@ function scan(root: Node): void {
   for (let n = walker.nextNode(); n; n = walker.nextNode()) check(n);
 }
 
+const DAY_MS = 86_400_000;
+let driversRequested = false;
+
+function applyDrivers(names: string[]): void {
+  setDrivers(names);
+  if (on) scan(document);
+  sync();
+}
+
+/** This season's drivers (incl. replacements and FP1 rookies), cached for a day. */
+async function loadDrivers(): Promise<void> {
+  const { drivers } = (await chrome.storage.local.get('drivers')) as { drivers?: { names: string[]; at: number } };
+  if (drivers?.names.length) applyDrivers(drivers.names);
+  if (drivers && Date.now() - drivers.at < DAY_MS) return;
+  const res = await fetch(DRIVERS_URL, { signal: AbortSignal.timeout(60_000) });
+  const names = parseDrivers(await res.json());
+  if (!names.length) return;
+  await chrome.storage.local.set({ drivers: { names, at: Date.now() } });
+  applyDrivers(names);
+}
+
 function sync(): void {
   const next = isF1Page(location.href);
   if (next !== on) {
     on = next;
     document.documentElement.toggleAttribute(ATTR, on);
+    if (on && !driversRequested) { driversRequested = true; void loadDrivers().catch(() => {}); } // offline: seed grid applies
     if (on) scan(document);
     else for (const el of document.querySelectorAll(`[${MARK}]`)) el.removeAttribute(MARK);
   }
