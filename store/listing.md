@@ -58,8 +58,6 @@ Replay Guard is an independent project. It is not affiliated with, endorsed by o
 | Marquee promo tile | leave empty (optional, 1400x560) | |
 | Global promo video | leave empty (optional YouTube URL) | |
 
-Regenerate the images with `npm run assets` after editing `icons/icon.svg`, `store/screenshot.html` or `store/promo.html`.
-
 ### Additional fields
 
 | Field | Value |

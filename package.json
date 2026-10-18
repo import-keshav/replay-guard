@@ -8,8 +8,7 @@
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node --test 'test/*.test.mjs'",
-    "package": "node scripts/build.mjs && rm -f replay-guard.zip && cd dist && zip -qr ../replay-guard.zip .",
-    "assets": "sh scripts/assets.sh"
+    "package": "node scripts/build.mjs && rm -f replay-guard.zip && cd dist && zip -qr ../replay-guard.zip ."
   },
   "devDependencies": {
     "@types/chrome": "^0.3.5",
